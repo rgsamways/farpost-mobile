@@ -1,0 +1,59 @@
+schema: spec-driven
+
+context: |
+  # Farpost Mobile
+
+  The single Android app meant to eventually cover every Farpost role (adjuster,
+  contractor, broker, owner, scout, etc.) — Compose/Kotlin, package `com.farpost.mobile`.
+  Talks to the same backend as `farpost-web` (`farpost-api`, a sibling repo at
+  `C:\dev\farpost-api`).
+
+  `farpost-scout` (`C:\dev\farpost-scout`) is a separate, older Android app covering
+  only the scout role. It is being retired once this app is trusted to replace it —
+  don't add new dependencies on it.
+
+  Full context, including cross-repo pointers to the platform-wide style guide and
+  role docs, lives in `CLAUDE.md` at the root of this repo — read that file in full
+  before proposing anything; this block is a condensed primer, not the complete
+  picture.
+
+  ## Stack
+  Kotlin, Jetpack Compose, Material3, Hilt (DI), Room (local persistence), Retrofit +
+  OkHttp (network), WorkManager (background sync), DataStore (session/preferences),
+  Navigation-Compose with type-safe routes.
+
+  ## Architecture rules (non-negotiable — see CLAUDE.md for full detail)
+  1. Offline-first always — every write lands in Room first, returns immediately.
+  2. The sync outbox (`PendingOperationEntity`/`PendingOperationDao`) is generic —
+     a new entity type registers a dispatch handler in `SyncWorker`, it does not get
+     its own sync table.
+  3. Repositories own data access — ViewModels never touch Room/Retrofit/DataStore
+     directly.
+  4. One destination = one `@Serializable object`, registered in both
+     `FarpostDestinations.kt` and `FarpostNavGraph.kt`.
+  5. The hub is the first screen after login for every role, driven off real
+     `professional.roles` data, never hardcoded per-role branching.
+  6. Capabilities are `ADMIN`/`PROFESSIONAL`/`OWNER` only — matches the backend
+     exactly. Role-specific behavior (scout, etc.) lives in `ProfessionalProfile.roles`,
+     never as its own capability.
+  7. Match `docs/farpost-style-guide.md` (main Farpost repo) — don't invent parallel
+     design tokens.
+
+  ## Current real state (as of 2026-07-17)
+  One-commit skeleton (`5f4ff49`, 2026-07-12). Real (not fake) auth against
+  farpost-api's live login endpoint, working end to end. `ProfessionalHubScreen`
+  exists as a real single-column role-row list; a `"scout"` role already navigates
+  to a real `ScoutCaptureScreen` (a flat note-capture log, local-first via Room).
+  The offline-sync outbox schema exists and writes correctly, but `SyncWorker`
+  itself is an explicit skeleton — it never actually sends a pending write to the
+  backend yet. No test suite exists yet.
+
+  ## In-flight work
+  Two handoffs, meant to land in this order:
+  1. Completing the offline-sync dispatch logic (`SyncWorker` real network calls,
+     connectivity-triggered resync, attempt tracking, sync-status observable).
+  2. A two-column hub skeleton with a scout-walk entry point (placeholder screen
+     only — the real scout-walk feature is separate, later work).
+
+  Full handoff docs: `C:\dev\farpost\docs\specs\farpost-mobile-offline-sync-completion-handoff.md`
+  and `C:\dev\farpost\docs\specs\farpost-mobile-hub-scout-walk-handoff.md`.

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug build type only — allows plain HTTP to localhost (via `adb reverse
+     tcp:8000 tcp:8000`, works for both the emulator and a USB-attached physical
+     device) so local farpost-api (uvicorn, no TLS) is reachable. Release keeps
+     the platform default (HTTPS-only, no cleartext exceptions). -->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">127.0.0.1</domain>
+    </domain-config>
+</network-security-config>

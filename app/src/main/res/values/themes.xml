@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--
+        Base platform theme. Compose renders its own Material3 theme (see
+        ui/theme/Theme.kt) — this only needs to set the window background so
+        there's no flash-of-wrong-color before Compose takes over, and it is
+        deliberately light-only: the real Farpost web app has no dark mode
+        today (see style guide §0), so we don't inherit a day/night split here.
+    -->
+    <style name="Theme.Farpost" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
+        <item name="android:windowBackground">#F8FAFC</item>
+    </style>
+</resources>
